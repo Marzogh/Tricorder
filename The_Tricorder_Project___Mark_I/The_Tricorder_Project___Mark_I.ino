@@ -1,3 +1,20 @@
+// =====================================================================================================================================================================  //
+//                                                                                                                                                                        //
+//   dBBBBBBP dBP dBP dBBBP      dBBBBBBP dBBBBBb    dBP dBBBP  dBBBBP dBBBBBb    dBBBBb  dBBBP dBBBBBb       dBBBBBb dBBBBBb    dBBBBP    dBP dBBBP  dBBBP dBBBBBBP      //
+//                                           dBP              dBP.BP      dBP       dBP            dBP           dB'     dBP   dBP.BP                                     //
+//   dBP   dBBBBBP dBBP          dBP     dBBBBK   dBP dBP    dBP.BP   dBBBBK   dBP dBP dBBP    dBBBBK        dBBBP'  dBBBBK   dBP.BP    dBP dBBP   dBP      dBP           //
+//  dBP   dBP dBP dBP           dBP     dBP  BB  dBP dBP    dBP.BP   dBP  BB  dBP dBP dBP     dBP  BB       dBP     dBP  BB  dBP.BP dB'dBP dBP    dBP      dBP            //
+// dBP   dBP dBP dBBBBP        dBP     dBP  dB' dBP dBBBBP dBBBBP   dBP  dB' dBBBBBP dBBBBP  dBP  dB'      dBP     dBP  dB' dBBBBP dBBBBP dBBBBP dBBBBP   dBP             //
+//                                                                                                                                                                        //
+//                                    A Handheld Universal Sensor System designed to replicate the functions of the 'Tricorder' from Star Trek                            //
+//                                                                         by Prajwal Bhattaram                                                                           //
+//                                                                                 Mark I                                                                                 //
+//                                                                                v.1.2.1                                                                                 //
+//                                                                              29.May.2014                                                                               //
+//                                                                                                                                                                        //
+// =====================================================================================================================================================================  //
+
+
   /*
     # Code for Soil Moisture & Temperature sensor + Ambient Light sensor with Nokia 5110 LCD display
     # A.K.A The Tricorder Project - Mark 1
