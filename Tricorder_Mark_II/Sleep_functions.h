@@ -1,6 +1,6 @@
-  #include <avr/interrupt.h>
-  #include <avr/power.h>
-  #include <avr/sleep.h>
+  //#include <avr/interrupt.h>
+  //#include <avr/power.h>
+  //#include <avr/sleep.h>
 
   //#include <avr/io.h> //Optional include if pin control is necessary
 
@@ -26,42 +26,17 @@
     //pininterrupt()
     void pinInterrupt(void)
       {
-        // This will bring us back from sleep.
+        /* This will bring us back from sleep. */
         
-        // We detach the interrupt to stop it from continuously firing while the interrupt pin is low.
+        /* We detach the interrupt to stop it from 
+         * continuously firing while the interrupt pin
+         * is low.
+         */
       }
-      
-      //LEDFadeOn()
-      void LEDFadeOn()
-      {
-        for (int i=0; i<256; i++)
-            {
-              analogWrite(LED, i);
-              delay(10);  // turn LED on
-            }
-      } 
- 
-      
-      //LEDFadeOff()
-      void LEDFadeOff()
-      {
-        for (int i=255; i>=0; i--)
-            {
-              analogWrite(LED, i);
-              delay(10);  // turn LED off
-            }
-      }
-      
-      
     
     //sleepNow()
     void sleepNow(void)
     {
-      //LEDFadeOn();
-      //delay(50);
-      LEDFadeOff();
-      //delay(50);
-      
       // Choose preferred sleep mode:
       set_sleep_mode(SLEEP_MODE_PWR_DOWN);
       
@@ -80,8 +55,4 @@
       sleep_disable();
       
       detachInterrupt(0);
-      
-      LEDFadeOn();
-      delay(100);
-      LEDFadeOff();
     }
