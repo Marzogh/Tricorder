@@ -5,7 +5,7 @@ void startHTU()
   Serial.println("HTU21D-F test");
   if (!htu.begin())
   {
-        Serial.println("Couldn't find sensor!");
+    Serial.println("Couldn't find sensor!");
     while (1);
   }
 }
@@ -19,4 +19,6 @@ void readHTU()
   Serial.print("\t\tHum: "); Serial.println(airH);
   delay(500);
   #endif
+  
+  delay(50);
 }

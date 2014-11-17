@@ -16,3 +16,14 @@ byte bcdToDec(byte val)
   // Convert binary coded decimal to normal decimal bers
   return ( (val/16*10) + (val%16) );
 }
+
+void error(char *str)
+{
+  Serial.print("error: ");
+  Serial.println(str);
+  
+  // red LED indicates error
+  digitalWrite(redLEDpin, HIGH);
+  
+  while(1);
+}

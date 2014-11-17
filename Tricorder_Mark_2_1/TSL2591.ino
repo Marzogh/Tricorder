@@ -107,6 +107,8 @@ void readTSL(void)
   Serial.print("Visible: "); Serial.print(full - ir); Serial.print("  ");
   Serial.print("Lux: "); Serial.println(tsl.calculateLux(full, ir));
   #endif
+  
+  delay(50);
 }
 
 

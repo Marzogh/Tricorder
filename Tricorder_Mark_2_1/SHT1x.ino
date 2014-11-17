@@ -17,4 +17,6 @@ void readSHT()
   Serial.print(soilH);
   Serial.println("%");
   #endif
+  
+  delay(200);
 }

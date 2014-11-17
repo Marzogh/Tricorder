@@ -1,4 +1,4 @@
-
+/*
 
   void getClock()
   {
@@ -29,4 +29,15 @@
     Serial.print(":");
     Serial.println(second);
     #endif
+  }*/
+  
+void startRTC()
+{
+  if (!RTC.begin()) 
+  {
+      logfile.println("RTC failed");
+    #if DEBUG
+      Serial.println("RTC failed");
+    #endif  //DEBUG
   }
+}

@@ -20,14 +20,17 @@
   float airT, airH, soilT, soilH;
   //float temp_f; //Uncomment for temperature in Fahrenheit
   uint32_t syncTime, sType = 0;
-  int  second, minute, hour, weekDay, monthDay, month, year;
-  char filename[] = "00000000.csv";
+  //int  second, minute, hour, weekDay, monthDay, month, year;
+  char filename[13] = {0};
+  //char filename[] = "00000000.csv";
   uint8_t * heapptr, * stackptr;
   
-  
   //Pins
-  #define dataPin  9
-  #define clockPin 8
+  #define dataPin  9          //SHT1x
+  #define clockPin 8          //SHT1x
+  #define chipSelect 10       //SD
+  #define redLEDpin 7         //SD
+  //#define greenLEDpin 4       //SD
   
   
   //Initiate Objects
@@ -39,10 +42,12 @@
   
   void setup()
   {
-    Serial.begin(115200);
+    Serial.begin(115200);Wire.begin();
     startTSL();
     startHTU();
-    
+    startSD();
+    startRTC();
+    makeFile();
     #if DEBUG
     displayTSLDetails();
     #endif
@@ -54,8 +59,6 @@
     readTSL();
     readHTU();
     readSHT();
-    void getClock();
-    void getFileName();
-    void logData();
+    logData();
     
   }
