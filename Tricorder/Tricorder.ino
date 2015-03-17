@@ -1,7 +1,9 @@
 //Definitions
-#define DEBUG false                              //Permit all debugging code to be run
+#define DEBUG false                             //Permit all debugging code to be run
 #define GPSattached false                       //Define if GPS is attached
 #define UVSensor true                           //Define if UV Sensor is attached
+#define HTU21DFattached false                   //Define if HTU21DF sensor is attached
+#define AM2315attached true                     //Define if AM2315 is attached
 
 //Libraries
 #if GPSattached
@@ -16,7 +18,15 @@
 #include <RTClib.h>                              //For RTC
 #include <Adafruit_TSL2591.h>                    //For Light sensor
 #include <Adafruit_Sensor.h>                     //For Light sensor
+
+#if AM2315attached
+#include <Adafruit_AM2315.h>                     //For Air Temperature and Humidity sensor
+#endif
+
+#if HTU21DFattached
 #include <Adafruit_HTU21DF.h>                    //For Air Temperature and Humidity sensor
+#endif
+
 #include <SHT1x.h>                               //For Soil Temperature and Moisture sensor
 
 //#include <EEPROM.h>                              //For EEPROM access
@@ -55,7 +65,12 @@ SdFat sd;                                         //Initiate sd object for SdFat
 SdFile logfile;                                   //Initiate File object for SD card
 RTC_DS1307 rtc;                                   //Initiate RTC object for Real Time Clock
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);    //Initiate TSL2591 object for light sensor
+#if HTU21DFattached
 Adafruit_HTU21DF htu = Adafruit_HTU21DF();        //Initiate HTU21DF object for air sensor
+#endif
+#if AM2315attached                                //Initiate AM2315 object for air sensor
+Adafruit_AM2315 am2315;
+#endif
 SHT1x sht1x(dataPin, clockPin);                   //Initiate SHT1X object for soil sensor
 
 

@@ -74,13 +74,13 @@ void logData()
   else
   debug.print(F("Artificial"));
   debug.print(F(","));
-  debug.print(soilT,1);
+  debug.print(soilT,2);
   debug.print(F(","));
-  debug.print(soilH,1);
+  debug.print(soilH,2);
   debug.print(F(","));
-  debug.print(airT,1);
+  debug.print(airT,2);
   debug.print(F(","));
-  debug.print(airH,1);
+  debug.print(airH,2);
   debug.print(F(","));
   debug.print(full);
   debug.print(F(","));

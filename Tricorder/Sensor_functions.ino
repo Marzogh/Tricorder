@@ -38,7 +38,7 @@ void startSensors()
     return;
   }
   configureSensor();
-
+#if HTU21DFattached
   if (!htu.begin())
   {
     debug.println("Couldn't find sensor!");
@@ -47,7 +47,17 @@ void startSensors()
     lcd.println(F("HTU21DF.01x01"));                     //Error code on LCD
     while (1);
   }
-
+#endif
+#if AM2315attached
+if (! am2315.begin())
+{
+    debug.println("Sensor not found, check wiring & pullups!");
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.println(F("AM2315.01x01"));                     //Error code on LCD
+     while (1);
+  }
+  #endif
   debug.println("Sensors started!");
 }
 

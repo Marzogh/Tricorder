@@ -1,10 +1,10 @@
-#if HTU21DFattached
+#if AM2315attached
 void readAir()                                //Reads values from the HTU21DF breakout board exposed to the air
 {
-  airT = htu.readTemperature();
+  airT = am2315.readTemperature();
   debug.print("Air Temp: ");
   debug.print(soilT);
-  airH = htu.readHumidity();
+  airH = am2315.readHumidity();
   debug.print(" Air Humidity: ");
   debug.println(airH);
 }
