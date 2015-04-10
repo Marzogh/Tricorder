@@ -14,10 +14,13 @@ The device comprises the following parts:
 1.  Arduino Fio x 1
 2.  SHT-15 sensor in a cyindrical metal mesh casing x 1
 3.  TSL2561 lux sensor x 1
-4.  Nokia 5110 48 x 84 monochrome LCD screen x 1
-5.  A 500mAH battery x 1
-6.  Prototyping board x 1
-7.  On/Off switch x 1
-8.  Momentary button x 1
-9.  Red LED x 1
-10.  Sparkfun project case x 1
+4.  HTU21D-F Temperature and Humidity sensor x 1
+5.  Micro-SD card breakout
+6.  Real Time Clock
+7.  Nokia 5110 48 x 84 monochrome LCD screen x 1
+8.  A 1000mAH battery x 1
+9.  Prototyping board x 1
+10.  On/Off switch x 1
+11.  Momentary button x 1
+12.  WS2812 Breakout x 1
+13.  Adafruit Arduino enclosure x 1
