@@ -1,4 +1,5 @@
-void configureSensor(void)
+#if TSL2591attached
+void configureTSL2591(void)
 {
   // You can change the gain on the fly, to adapt to brighter/dimmer light situations
   //tsl.setGain(TSL2591_GAIN_LOW);    // 1x gain (bright light)
@@ -37,5 +38,6 @@ void readLight()
   debug.print("Lux: "); 
   debug.println(tsl.calculateLux(full, ir));
 }
+#endif
 
 

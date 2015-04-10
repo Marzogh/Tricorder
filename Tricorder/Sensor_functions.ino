@@ -10,7 +10,7 @@ void startSensors()
     lcd.println(F("GPS.01x01"));                           //Error code on LCD
     return;
   }
-#else
+#else if RTCattached
   if (! rtc.isrunning())                                   //If RTC is not running
   {
     debug.println("RTC is NOT running!");                  //Report RTC failure
@@ -19,6 +19,7 @@ void startSensors()
     lcd.println(F("RTC.01x01"));                           //Error code on LCD
   }
 #endif
+#if SDattached
   if (!sd.begin(chipSelect, SPI_FULL_SPEED))              //Use SPI_HALF_SPEED if on a breadboard to prevent bus errors
   {
     sd.initErrorHalt();
@@ -28,7 +29,8 @@ void startSensors()
     lcd.println(F("SD.01X01"));                           //Error code on LCD
   }
   makeFile();
-
+#endif
+#if TSL2591attached
   if (!tsl.begin()) 
   {
     debug.println("No sensor found ... check your wiring?");
@@ -37,8 +39,20 @@ void startSensors()
     lcd.println(F("TSL2591.01x01"));                     //Error code on LCD
     return;
   }
-  configureSensor();
-
+  configureTSL2591();
+#endif
+#if TSL2561attached
+  if (!tsl.begin()) 
+  {
+    debug.println("No sensor found ... check your wiring?");
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.println(F("TSL2561.01x01"));                     //Error code on LCD
+    return;
+  }
+  configureTSL2561();
+#endif
+#if HTU21DFattached
   if (!htu.begin())
   {
     debug.println("Couldn't find sensor!");
@@ -47,7 +61,17 @@ void startSensors()
     lcd.println(F("HTU21DF.01x01"));                     //Error code on LCD
     while (1);
   }
-
+#endif
+#if AM2315attached
+if (! am2315.begin())
+{
+    debug.println("Sensor not found, check wiring & pullups!");
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.println(F("AM2315.01x01"));                     //Error code on LCD
+     while (1);
+  }
+  #endif
   debug.println("Sensors started!");
 }
 

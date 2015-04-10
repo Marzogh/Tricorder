@@ -1,30 +1,77 @@
 //Definitions
-#define DEBUG false                              //Permit all debugging code to be run
+#define DEBUG false                             //Permit all debugging code to be run
 #define GPSattached false                       //Define if GPS is attached
-#define UVSensor true                           //Define if UV Sensor is attached
+#define UVSensor false                          //Define if UV Sensor is attached
+#define HTU21DFattached true                    //Define if HTU21DF sensor is attached
+#define AM2315attached false                    //Define if AM2315 is attached
+#define SHT1Xattached true                      //Define if SHT1X is attached
+#define TSL2591attached false                    //Define if TSL2591 is attached
+#define TSL2561attached true                   //Define if TSL2591 is attached
+#define RTCattached true                        //Define if RTC is attached
+#define LCDattached true                        //Define if LCD is attached
+#define SDattached true                         //Define if SD is attached
+#define EEPROMrequired false                    //Define id EEPROM is required
 
 //Libraries
+
+#include <Wire.h>                                //For I2C devices
+
 #if GPSattached
 #include <TinyGPS++.h>                           //For GPS
 #include <SoftwareSerial.h>                      //For GPS
 #endif
 
-#include <Wire.h>                                //For I2C devices
+#if LCDattached
 #include <LCD.h>                                 //For LCD display
 #include <LiquidCrystal_I2C.h>                   //For LCD display
+#endif
+
+#if SDattached
 #include <SdFat.h>                               //For SD card
+#endif
+
+#if RTCattached
 #include <RTClib.h>                              //For RTC
+#endif
+
+#if TSL2591attached
 #include <Adafruit_TSL2591.h>                    //For Light sensor
 #include <Adafruit_Sensor.h>                     //For Light sensor
-#include <Adafruit_HTU21DF.h>                    //For Air Temperature and Humidity sensor
-#include <SHT1x.h>                               //For Soil Temperature and Moisture sensor
+#endif
 
-//#include <EEPROM.h>                              //For EEPROM access
+#if TSL2561attached
+#include <SFE_TSL2561.h>                         //For Light sensor
+#endif
+
+#if AM2315attached
+#include <Adafruit_AM2315.h>                     //For Air Temperature and Humidity sensor
+#endif
+
+#if HTU21DFattached
+#include <Adafruit_HTU21DF.h>                    //For Air Temperature and Humidity sensor
+#endif
+
+#if SHT1Xattached
+#include <SHT1x.h>                               //For Soil Temperature and Moisture sensor
+#endif
+
+#if EEPROMrequired
+#include <EEPROM.h>                              //For EEPROM access
+#endif
 
 
 //Variables
 boolean newRead, sType = LOW;
+
+#if TSL2561attached
+boolean gain;                                    // Gain setting, 0 = X1, 1 = X16;
+uint16_t ms;                                 // Integration ("shutter") time in milliseconds
+double lux;
+#endif
+
+#if TSL2591attached
 uint16_t ir, full, vis, uv, lux;
+#endif
 uint32_t lum;
 float soilT, soilH, airT, airH;
 float prev_soilT, prev_soilH, prev_airT, prev_airH;
@@ -50,12 +97,28 @@ static const uint32_t GPSBaud = 9600;             //Set GPS Baud rate
 #if GPSattached
 TinyGPSPlus gps;                                  //Initiate TinyGPS object for GPS
 #endif
+#if LCDattached
 LiquidCrystal_I2C lcd(0x27,2,1,0,4,5,6,7);        //Initiate LiquidCrystal object for LCD. (0x27 is the I2C bus address for an unmodified I2C backpack)
+#endif
+#if SDattached
 SdFat sd;                                         //Initiate sd object for SdFat library
 SdFile logfile;                                   //Initiate File object for SD card
+#endif
+#if RTCattached
 RTC_DS1307 rtc;                                   //Initiate RTC object for Real Time Clock
+#endif
+#if TSL2591attached
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);    //Initiate TSL2591 object for light sensor
+#endif
+#if TSL2561attached
+SFE_TSL2561 tsl;                                //Initiate TSL2591 object for light sensor
+#endif
+#if HTU21DFattached
 Adafruit_HTU21DF htu = Adafruit_HTU21DF();        //Initiate HTU21DF object for air sensor
+#endif
+#if AM2315attached                                //Initiate AM2315 object for air sensor
+Adafruit_AM2315 am2315;
+#endif
 SHT1x sht1x(dataPin, clockPin);                   //Initiate SHT1X object for soil sensor
 
 
@@ -76,7 +139,9 @@ void setup()
   GPS.begin(GPSBaud);                             //Begins GPS Software Serial stream
 #endif
   Wire.begin();                                   //Begin I2C library
+#if RTCattached
   rtc.begin();                                    //Begin RTC
+#endif
 
   pinMode (chipSelect, OUTPUT);                   //Set SD chipselect pin to output
   pinMode (sampleSelect, INPUT_PULLUP);           //Set the sampleSelect pin to INPUT and turn on pull-up resistors for the sampleSelect pin
