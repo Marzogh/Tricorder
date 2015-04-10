@@ -10,7 +10,7 @@ float Average (float current, float prev)
 void resetVariables()
 {
   prev_airT, prev_airH, prev_soilT, prev_soilH = 0;
-  newRead = !newRead;
+  //newRead = !newRead;
 }
 
 

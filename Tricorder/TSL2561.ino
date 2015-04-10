@@ -1,50 +1,39 @@
 #if TSL2561attached
-void configureTSL2561()
+void configureTSL2561(void)
 {
-  // The light sensor has a default integration time of 402ms,and a default gain of low (1X).
-  // If you would like to change either of these, you can do so using the setTiming() command.
-  // If gain = false (0), device is set to low gain (1X)
-  // If gain = high (1), device is set to high gain (16X)
+  /* You can also manually set the gain or enable auto-gain support */
+  // tsl.setGain(TSL2561_GAIN_1X);      /* No gain ... use in bright light to avoid sensor saturation */
+  // tsl.setGain(TSL2561_GAIN_16X);     /* 16x gain ... use in low light to boost sensitivity */
+  tsl.enableAutoRange(true);            /* Auto-gain ... switches automatically between 1x and 16x */
+  
+  /* Changing the integration time gives you better sensor resolution (402ms = 16-bit data) */
+  //tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_13MS);      /* fast but low resolution */
+  tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_101MS);  /* medium resolution and speed   */
+  //tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_402MS);  /* 16-bit data but slowest conversions */
 
-  gain = 0;
-
-  // If time = 0, integration will be 13.7ms
-  // If time = 1, integration will be 101ms
-  // If time = 2, integration will be 402ms
-  // If time = 3, use manual start / stop to perform your own integration
-
-  unsigned char time = 2;
-
-  // setTiming() will set the third parameter (ms) to the
-  // requested integration time in ms (this will be useful later):
-
-  Serial.println("Set timing...");
-  tsl.setTiming(gain,time,ms); 
-  tsl.setPowerUp();
+  /* Update these values depending on what you've set above! */  
+  Serial.println("------------------------------------");
+  Serial.print  ("Gain:         "); Serial.println("Auto");
+  Serial.print  ("Timing:       "); Serial.println("13 ms");
+  Serial.println("------------------------------------");
 }
 
 void readLight()
 {
-  uint16_t vis, ir;
-  delay(ms);
-  if (tsl.getData(vis,ir))
+    /* Get a new sensor event */ 
+  sensors_event_t event;
+  tsl.getEvent(&event);
+ 
+  /* Display the results (light is measured in lux) */
+  if (event.light)
   {
-    boolean good;  // True if neither sensor is saturated
-    good = tsl.getLux(gain,ms,vis,ir,lux);
-    debug.print("[ "); 
-    debug.print(millis()); 
-    debug.print(" ms ] ");
-    debug.print("IR: "); 
-    debug.print(ir);  
-    debug.print("  ");
-    debug.print("Full: "); 
-    debug.print(vis + ir); 
-    debug.print("  ");
-    debug.print("Visible: "); 
-    debug.print(vis); 
-    debug.print("  ");
-    debug.print("Lux: "); 
-    debug.println(lux);
+    lux = (event.light);
+  }
+  else
+  {
+    /* If event.light = 0 lux the sensor is probably saturated
+       and no reliable data could be generated! */
+    Serial.println("Sensor overload");
   }
 }
 #endif

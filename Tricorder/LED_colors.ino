@@ -1,54 +1,38 @@
-  // The ledIO() function turns on or off an LED (in a particular color - if RGB) based on the mode passed to it. The mode can be the color of LED - in lower case - if RGB
-  //or simply on or off if a single color LED
-  void ledIO(uint8_t mode)
-  {
-    switch (mode) {
+// The ledIO() function turns on or off an LED (in a particular color - if RGB) based on the mode passed to it. The mode can be the color of LED - in lower case - if RGB
+//or simply on or off if a single color LED
+void ledIO(uint8_t mode)
+{
+  switch (mode) {
     case 1:                                            //RED
-      digitalWrite(RLED, HIGH);
-      digitalWrite(GLED, LOW);
-      digitalWrite(BLED, LOW);
+      pixels.setPixelColor(0, pixels.Color(255, 0, 0));
       break;
-  
+
     case 2:                                            //GREEN
-      digitalWrite(RLED, LOW);
-      digitalWrite(GLED, HIGH);
-      digitalWrite(BLED, LOW);
+      pixels.setPixelColor(0, pixels.Color(0, 255, 0));
       break;
-  
+
     case 3:                                            //BLUE
-      digitalWrite(RLED, LOW);
-      digitalWrite(GLED, LOW);
-      digitalWrite(BLED, HIGH);
+      pixels.setPixelColor(0, pixels.Color(0, 0, 255));
       break;
-  
+
     case 4:                                            //PURPLE
-      analogWrite(RLED, 127);
-      analogWrite(GLED, 0);
-      analogWrite(BLED, 127);
+      pixels.setPixelColor(0, pixels.Color(127, 0, 127));
       break;
-  
+
     case 5:                                            //TEAL
-      analogWrite(RLED, 0);
-      analogWrite(BLED, 127);
-      analogWrite(GLED, 127);
+      pixels.setPixelColor(0, pixels.Color(0, 127, 127));
       break;
-  
+
     case 6:                                            //ORANGE
-      analogWrite(RLED, 255);
-      analogWrite(BLED, 0);
-      analogWrite(GLED, 50);
+      pixels.setPixelColor(0, pixels.Color(255, 0, 50));
       break;
-  
+
     case 7:                                            //WHITE
-      digitalWrite(RLED, HIGH);
-      analogWrite(BLED, 127);
-      analogWrite(GLED, 127);
+      pixels.setPixelColor(0, pixels.Color(255, 127, 127));
       break;
-  
+
     case 0:                                            //OFF
-      digitalWrite(RLED, LOW);
-      digitalWrite(BLED, LOW);
-      digitalWrite(GLED, LOW);
-    }
+      pixels.setPixelColor(0, pixels.Color(0, 0, 0));
   }
+}
 

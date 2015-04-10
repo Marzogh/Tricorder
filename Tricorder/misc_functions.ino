@@ -31,15 +31,18 @@ void error()
   while (1);
 }
 
-void readButton()
+/*void readButton()
 {
   newRead = !newRead;
 }
 
 void sampleType()
 {
-  sType = !sType;
-}
+  if (digitalRead(3) == LOW)
+  stype = 0;
+  else
+  stype = 1;
+}*/
 
 long readVcc() 
 {
@@ -66,14 +69,6 @@ long readVcc()
 
   result = 1125300L / result; // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000
   return result; // Vcc in millivolts
-}
-
-
-int freeRam ()
-{
-  extern int __heap_start, *__brkval; 
-  int v; 
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
 }
 
 

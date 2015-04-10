@@ -1,5 +1,5 @@
 
-void initiateLCD()                                                          //Initiates LCD
+void splashScreen()                                                          //Initiates LCD
 {
   debug.println(F("Starting Tricorder"));
   /*Use code below for 20x4 display
@@ -14,7 +14,7 @@ void initiateLCD()                                                          //In
   /*Use code below for 16x2 display */
   lcd.print(F("The Tricorder")); 
   lcd.setCursor (0,1);                                                     
-  lcd.print(F("Uni of Qld"));
+  lcd.print(F("PrajwalBhattaram"));
   delay(2000);
   lcd.clear();
 }
@@ -22,12 +22,21 @@ void initiateLCD()                                                          //In
 void startLCD()
 {
   //lcd.begin (20,4);                                                         //Settings for 20 x 4 LCD module. For the 20x2 module change to (20,2)
-  lcd.begin (16,2);                                                         //Settings for 20 x 4 LCD module. For the 20x2 module change to (20,2)
+  lcd.begin (16,2);                                                         //Settings for 16 x 2 LCD module. For the 20x2 module change to (20,2)
   lcd.setBacklightPin(3,POSITIVE);
   lcd.setBacklight(HIGH);
   delay(50);
   debug.println(F("Starting LCD"));
-  initiateLCD();
+}
+
+void stopLCD()
+{
+  lcd.home();
+  lcd.clear();
+  //lcd.setBacklightPin(3,POSITIVE);
+  lcd.setBacklight(LOW);
+  delay(50);
+  debug.println(F("Stopping LCD"));
 }
 
 void initialLCDState()
@@ -36,7 +45,7 @@ void initialLCDState()
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print(F("Take a reading"));                //LCD shows message
-  while (newRead == LOW)
+  /* while (newRead == LOW)
   {
     debug.println(F("Take a reading..."));       //This section on code animates the "Take a reading......" that is displayed on the LCD screen
     lcd.setCursor(14,0);
@@ -52,7 +61,7 @@ void initialLCDState()
     lcd.setCursor(14,0);
     lcd.print("      ");
     delay(10);
-  }
+  }*/
 }
 
 void displaySensors(uint8_t repeats)                                                       //Displays sensor values on LCD after the readings are done

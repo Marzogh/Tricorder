@@ -21,7 +21,7 @@ void logData()
 #endif
 
   logfile.print(F(","));
-  if (sType == LOW)
+  if (digitalRead(3) == LOW)
     logfile.print(F("Spider"));
   else
     logfile.print(F("Artificial"));
@@ -137,7 +137,11 @@ void makeFile()
   while (!sd.exists(filename))
   {
     logfile.open(filename, FILE_WRITE); 
-    logfile.print(F("Time,Sample Type,Soil Temperature,Soil Moisture,Air Temperature,Air Humidity,Full spectrum,IR,Visible,"));
+    logfile.print(F("Time,Sample Type,Soil Temperature,Soil Moisture,Air Temperature,Air Humidity,"));
+    
+    #if TSL2591attached
+    logfile.print(F("Full spectrum,IR,Visible,"));
+    #endif
 
 #if UVSensor
     logfile.print(F("UV,"));

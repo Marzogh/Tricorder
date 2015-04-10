@@ -1,4 +1,6 @@
-#if TSL2591attached
+/* //if TSL2591attached
+#include <Adafruit_TSL2591.h>                    //For Light sensor
+
 void configureTSL2591(void)
 {
   // You can change the gain on the fly, to adapt to brighter/dimmer light situations
@@ -38,6 +40,6 @@ void readLight()
   debug.print("Lux: "); 
   debug.println(tsl.calculateLux(full, ir));
 }
-#endif
+#endif*/
 
 

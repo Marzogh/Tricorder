@@ -9,6 +9,7 @@ void flashLED(uint8_t color, uint8_t repeat, uint16_t time)
   while (i<repeat)
   {
     ledIO(color);
+    pixels.show();
     delay(time);
     ledIO(0);
     delay(time);

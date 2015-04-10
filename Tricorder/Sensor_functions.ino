@@ -42,13 +42,11 @@ void startSensors()
   configureTSL2591();
 #endif
 #if TSL2561attached
-  if (!tsl.begin()) 
+  if(!tsl.begin())
   {
-    debug.println("No sensor found ... check your wiring?");
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.println(F("TSL2561.01x01"));                     //Error code on LCD
-    return;
+    /* There was a problem detecting the ADXL345 ... check your connections */
+    debug.print("Ooops, no TSL2561 detected ... Check your wiring or I2C ADDR!");
+    while(1);
   }
   configureTSL2561();
 #endif
