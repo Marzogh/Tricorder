@@ -1,117 +1,115 @@
-//Definitions
-#define DEBUG false                              //Permit all debugging code to be run
-#define GPSattached false                       //Define if GPS is attached
-#define UVSensor true                           //Define if UV Sensor is attached
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Definitions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+#define SERIAL_ECHO
 
-//Libraries
-#if GPSattached
-#include <TinyGPS++.h>                           //For GPS
-#include <SoftwareSerial.h>                      //For GPS
-#endif
-
-#include <Wire.h>                                //For I2C devices
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Libraries ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_TSL2591.h>
+#include <SHT1x.h>
+#include "HTU21D.h"
+#include <RTClib.h>
+#include <SdFat.h>
 #include <LCD.h>                                 //For LCD display
 #include <LiquidCrystal_I2C.h>                   //For LCD display
-#include <SdFat.h>                               //For SD card
-#include <RTClib.h>                              //For RTC
-#include <Adafruit_TSL2591.h>                    //For Light sensor
-#include <Adafruit_Sensor.h>                     //For Light sensor
-#include <Adafruit_HTU21DF.h>                    //For Air Temperature and Humidity sensor
-#include <SHT1x.h>                               //For Soil Temperature and Moisture sensor
+#include <Adafruit_NeoPixel.h>
+#include <ClickEncoder.h>
+#include <TimerOne.h>
+#include <avr/sleep.h>
+#include <avr/power.h>                           // Power management
 
-//#include <EEPROM.h>                              //For EEPROM access
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~ Pin definitions ~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+#define dataPin A3
+#define clockPin A2
+#define chipSelect 10
+#define LEDPIN     9
+#define NUMPIXELS  1
+#define startupDelay 1000
 
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Objects ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
+LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7); //Initiate LiquidCrystal object for LCD. (0x27 is the I2C bus address for an unmodified I2C backpack)
+SHT1x sht1x(dataPin, clockPin);
+HTU21D air;
+RTC_DS1307 rtc;
+SdFat sd;
+SdFile logfile;
+Adafruit_NeoPixel LED = Adafruit_NeoPixel(NUMPIXELS, LEDPIN, NEO_GRB + NEO_KHZ800);
+ClickEncoder *encoder;
 
-//Variables
-boolean newRead, sType = LOW;
-uint16_t ir, full, vis, uv, lux;
-uint32_t lum;
-float soilT, soilH, airT, airH;
-float prev_soilT, prev_soilH, prev_airT, prev_airH;
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+float soilH, soilT, airH, airT;
+uint32_t lux;
 char filename[13] = {0};
+uint8_t sType, sNo = 0;
+boolean _sType, _sNo = false;
+byte val;
+int16_t last, value;
 
-
-//Pins
-const uint8_t RLED = 5;                           //Red LED pin
-const uint8_t GLED = 6;                           //Blue LED pin
-const uint8_t BLED = 9;                           //Green LED pin
-const uint8_t chipSelect = 10;                    //SD card chipselect pin
-const uint8_t sampleSelect = 3;                   //Sample selection (in this case - spider or artificial hole) - an SPST switch is connected to this pin
-const uint8_t clockPin = A2;                      //Clock pin for Soil sensor (SHT1X)
-const uint8_t dataPin = A3;                       //Data pin for Soil sensor (SHT1X)
-const uint8_t BUTTON = 2;
-
-#if GPSattached
-static const int RXPin = 7, TXPin = 8;            //TX and RX pins for Software Serial for GPS
-static const uint32_t GPSBaud = 9600;             //Set GPS Baud rate
-#endif
-
-//Initiate Objects
-#if GPSattached
-TinyGPSPlus gps;                                  //Initiate TinyGPS object for GPS
-#endif
-LiquidCrystal_I2C lcd(0x27,2,1,0,4,5,6,7);        //Initiate LiquidCrystal object for LCD. (0x27 is the I2C bus address for an unmodified I2C backpack)
-SdFat sd;                                         //Initiate sd object for SdFat library
-SdFile logfile;                                   //Initiate File object for SD card
-RTC_DS1307 rtc;                                   //Initiate RTC object for Real Time Clock
-Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);    //Initiate TSL2591 object for light sensor
-Adafruit_HTU21DF htu = Adafruit_HTU21DF();        //Initiate HTU21DF object for air sensor
-SHT1x sht1x(dataPin, clockPin);                   //Initiate SHT1X object for soil sensor
-
-
-//Declarations
-#if GPSattached
-SoftwareSerial GPS(RXPin, TXPin);                 //Declare Software Serial
-//HardwareSerial GPS = Serial1;                     //Only for Arduino Mega/Leonardo
-#endif
-HardwareSerial debug = Serial;                    //Declare debug from Hardware Serial
-
-
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Setup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 void setup()
 {
-#if DEBUG
-  debug.begin(9600);                              //Begin debug Hardware Serial stream
+#ifdef SERIAL_ECHO
+  Serial.begin(38400);                            //Begin Serial
 #endif
-#if GPSattached
-  GPS.begin(GPSBaud);                             //Begins GPS Software Serial stream
-#endif
-  Wire.begin();                                   //Begin I2C library
-  rtc.begin();                                    //Begin RTC
-
+  startLCD();                                     //Starts the LCD
+  LED.begin();
+  splashScreen();                                 //Shows splash screen
+  blinkBusy(1);                                    //Blinks busy LED
   pinMode (chipSelect, OUTPUT);                   //Set SD chipselect pin to output
-  pinMode (sampleSelect, INPUT_PULLUP);           //Set the sampleSelect pin to INPUT and turn on pull-up resistors for the sampleSelect pin
+  //pinMode (sampleSelect, INPUT_PULLUP);           //Set the sampleSelect pin to INPUT and turn on pull-up resistors for the sampleSelect pin
   pinMode (2, INPUT_PULLUP);                      //Set  pin 2 (interrupt pin 0) to INPUT and turn on pull-up resistors
   pinMode (3, INPUT_PULLUP);                      //Set  pin 3 (interrupt pin 1) to INPUT and turn on pull-up resistors
-  
-  pinMode(RLED, OUTPUT);
-  pinMode(GLED, OUTPUT);
-  pinMode(BLED, OUTPUT);
-
-  attachInterrupt(0, readButton, FALLING);        //Attach interrupt to pin 2 to detect change of state to FALLING
-  attachInterrupt(1, sampleType, LOW);            //Attach interrupt to pin 3 to detect change of state to LOW
-
-  startLCD();                                     //Starts the LCD
-  startSensors();                                 //Starts the sensors
+  tsl.begin();                                    //TSL2591 begin
+  configureSensor();
+  Serial.println(F("TSL2591 initialised"));
+  air.begin();                                    //HTU21DF begin
+  Serial.println(F("HTU21D initialised"));
+  rtc.begin();                                    //RTC begin
+  Serial.println(F("RTC initialised"));
+  if (!rtc.isrunning()) {
+    Serial.println("RTC is NOT running!");
+    blinkError(3);
+  }
+  if (!sd.begin(chipSelect, SPI_FULL_SPEED)) {    //SD begin
+    sd.initErrorHalt();
+  }
+  delay(startupDelay);
+  beginEncoders();
 }
 
 void loop()
 {
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Encoder code ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Sample Type: ");
+  do {
+    sType = readEncoders(1);
+  } while (!_sType);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Sample number: ");
+  do {
+    sNo = readEncoders(2);
+    //Serial.print(F("Sample Number = "));
+    //Serial.println(sNo);
+  } while (!_sNo);
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
   initialLCDState();
-  if (newRead == HIGH)                           //If a button press for a new reading is detected...
-  {
-    confirmReading();                            //Take a new reading and confirm the values are correct
-    debug.print("RAM: ");                        //Print RAM remaining over Serial
-    debug.println(freeRam());
-    displaySensors(2);
-  }
-  else
-  {
-    error();                                     //If an unknown signal is recieved, an error is declared
-  }
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TSL2561 code ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+  readLight();
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SHT1x code ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+  readSoil();
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HTU21DF code ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+  readAir();
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SD code ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+  makeFile();
+  logData();
+  displaySensors(3);
+  sleepNow();
+  /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 }
-
-
-
-
-
-
